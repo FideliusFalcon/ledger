@@ -143,14 +143,20 @@ func (a *App) callback(w http.ResponseWriter, r *http.Request) {
 		a.fail(w, err)
 		return
 	}
-	a.db.ExecContext(ctx, "DELETE FROM sessions WHERE expires_at < UTC_TIMESTAMP()")
+	if _, err := a.db.ExecContext(ctx, "DELETE FROM sessions WHERE expires_at < UTC_TIMESTAMP()"); err != nil {
+		log.Printf("removing expired sessions: %v", err) // housekeeping only; the login itself worked
+	}
 	a.setCookie(w, sessionCookie, token, "/", sessionTTL)
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 func (a *App) logout(w http.ResponseWriter, r *http.Request) {
 	if c, err := r.Cookie(sessionCookie); err == nil {
-		a.db.ExecContext(r.Context(), "DELETE FROM sessions WHERE token_hash = ?", hashToken(c.Value))
+		// If this fails the session stays valid, so say so instead of "logged out".
+		if _, err := a.db.ExecContext(r.Context(), "DELETE FROM sessions WHERE token_hash = ?", hashToken(c.Value)); err != nil {
+			a.fail(w, err)
+			return
+		}
 	}
 	a.setCookie(w, sessionCookie, "", "/", -time.Second)
 	http.Redirect(w, r, "/logged-out", http.StatusSeeOther)

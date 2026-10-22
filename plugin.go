@@ -22,4 +22,5 @@ type NavItem struct {
 
 var plugins []Plugin
 
+//nolint:unused // the plugin API; unused until the first plugin calls it from init()
 func register(p Plugin) { plugins = append(plugins, p) }

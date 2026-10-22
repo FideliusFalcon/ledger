@@ -1,0 +1,15 @@
+version: "2"
+
+linters:
+  settings:
+    errcheck:
+      # Errors from these cannot be acted on: Close and Rollback run deferred
+      # after the real error has been handled (Rollback after Commit fails by
+      # design), and writes to the HTTP response or a strings.Builder only fail
+      # when the client has gone or never.
+      exclude-functions:
+        - (*database/sql.Rows).Close
+        - (*database/sql.Tx).Rollback
+        - (*bytes.Buffer).WriteTo
+        - fmt.Fprint
+        - encoding/xml.EscapeText
