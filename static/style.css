@@ -91,7 +91,8 @@ input:invalid { border-color: var(--neg); }
 .yearnav a { text-decoration: none; font-size: 1.1rem; padding: .25rem .6rem; border-radius: 6px; }
 .yearnav a:hover { background: var(--head); }
 .yearnav select { font-size: 1.1rem; font-weight: 600; }
-.toolbar { position: sticky; top: 0; z-index: 2; display: flex; gap: .5rem; padding: .5rem 0; background: var(--bg); }
+.toolbar { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; gap: .5rem; padding: .5rem 0; background: var(--bg); }
+.toolbar > * { white-space: nowrap; }
 
 .scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
 table { border-collapse: collapse; white-space: nowrap; }
@@ -99,10 +100,14 @@ th, td { padding: .2rem .3rem; text-align: left; }
 tbody + tbody tr.head th { padding-top: 1.25rem; }
 tr.head th { background: var(--head); font-weight: 600; }
 tr.head th:not(:first-child) { text-align: right; font-weight: 500; color: var(--muted); }
-th:first-child, td:first-child { position: sticky; left: 0; background: var(--surface); z-index: 1; }
+th:first-child, td:first-child { position: sticky; left: 0; background: var(--surface); z-index: 1; box-shadow: inset -1px 0 0 var(--border); }
 tr.head th:first-child { background: var(--head); }
-td:first-child input { width: 15rem; }
-input.num { width: 5.5rem; text-align: right; }
+/* The name column follows the window, so a whole year fits on a laptop and a phone shows more than one month. */
+td:first-child input { width: clamp(7rem, 13vw, 15rem); }
+input.num { width: 4.5rem; text-align: right; }
+/* The grid fills the width it gets; the extra space goes between the amounts. */
+.budget table { width: 100%; }
+.budget td:has(> input.num) { text-align: right; }
 .num { text-align: right; font-variant-numeric: tabular-nums; }
 td.total { font-weight: 600; padding-left: .75rem; }
 tr.calc th, tr.calc td { border-top: 1px solid var(--border); font-weight: 600; }
@@ -110,10 +115,21 @@ tr.new input { color: var(--muted); }
 .neg { color: var(--neg); }
 .difference .neg { background: color-mix(in srgb, var(--neg) 15%, transparent); }
 .difference .pos { background: color-mix(in srgb, var(--pos) 15%, transparent); }
+@media (max-width: 640px) {
+  main { padding: .75rem .5rem; }
+  .scroll table { font-size: 14px; }
+  .scroll th, .scroll td { padding: .15rem .2rem; }
+  input.num { width: 4.25rem; padding: .2rem .3rem; }
+  td:first-child input { padding: .2rem .3rem; }
+}
+/* Keyboard shortcuts are no use on a touch screen. */
+@media (hover: none) and (pointer: coarse) {
+  [data-help] { display: none; }
+}
 
 /* Budget page: grid with charts beside it when there is room, else below. */
 .budget-layout { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 1rem; }
-.budget-layout > form { flex: 0 1 auto; min-width: 0; max-width: 100%; }
+.budget-layout > form { flex: 1 1 auto; min-width: 0; max-width: 100%; }
 .charts { flex: 1 1 380px; position: sticky; top: 1rem; display: grid; gap: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; }
 .charts > h2, .charts > .tiles, .charts > .wide { grid-column: 1 / -1; }
 .charts h2 { font-size: 1.1rem; margin: .5rem 0 0; }
