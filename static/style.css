@@ -54,6 +54,9 @@
 }
 
 * { box-sizing: border-box; }
+/* Saving and adding reload the page: fade between the two instead of flashing. */
+@view-transition { navigation: auto; }
+::view-transition-group(root) { animation-duration: .15s; }
 body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.4 system-ui, sans-serif; }
 a { color: var(--accent); }
 
@@ -111,7 +114,7 @@ input.num { width: 4.5rem; text-align: right; }
 .num { text-align: right; font-variant-numeric: tabular-nums; }
 td.total { font-weight: 600; padding-left: .75rem; }
 tr.calc th, tr.calc td { border-top: 1px solid var(--border); font-weight: 600; }
-tr.new input { color: var(--muted); }
+tr.head button.add { margin-left: .25rem; font-size: 1.15rem; line-height: 1; color: var(--accent); }
 .neg { color: var(--neg); }
 .difference .neg { background: color-mix(in srgb, var(--neg) 15%, transparent); }
 .difference .pos { background: color-mix(in srgb, var(--pos) 15%, transparent); }

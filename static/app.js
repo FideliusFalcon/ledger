@@ -130,11 +130,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Spreadsheet-like keys in the grid. In amount fields the arrows and h/j/k/l
   // always move; in name fields left/right only leave at the edge of the text.
-  // Enter saves (or adds the line, in a "new line" field).
+  // Enter saves.
   // More vim keys in amount fields: ^/$ first/last month, gg/G first/last line, { } previous/next
   // section, i/a cursor at start/end, Esc select again, x clear, u restore saved value, y copy, p paste.
-  const rows = [...form.querySelectorAll('tr.line, tr.new')]
-  const lineRows = rows.filter(r => r.classList.contains('line'))
+  const rows = [...form.querySelectorAll('tr.line')]
+  const lineRows = rows
   const sections = [...form.querySelectorAll('tbody[data-section]')].filter(b => b.querySelector('tr.line'))
   const go = inp => { if (inp) { inp.focus(); inp.select() } }
   const keys = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' }
@@ -147,9 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!tr || e.altKey || e.ctrlKey || e.metaKey) return
     if (e.key === 'Enter') {
       e.preventDefault()
-      const add = tr.classList.contains('new') && tr.querySelector('button')
-      if (add) add.click()
-      else form.requestSubmit(form.querySelector('button[value="save"]'))
+      form.requestSubmit(form.querySelector('button[value="save"]'))
       return
     }
     const num = inp.classList.contains('num')
@@ -232,6 +230,19 @@ document.addEventListener('DOMContentLoaded', () => {
       if (f) { f.focus({ preventScroll: true }); f.select() }
     }
   } catch {}
+
+  // A line was just added: select its placeholder name, so typing replaces it.
+  // The page stays where it was and only scrolls if the new line is out of view.
+  const addedID = new URLSearchParams(location.search).get('added')
+  if (addedID) {
+    history.replaceState(null, '', location.pathname)
+    const added = form.querySelector(`#line-${CSS.escape(addedID)} input`)
+    if (added) {
+      added.focus({ preventScroll: true })
+      added.select()
+      added.scrollIntoView({ block: 'nearest' })
+    }
+  }
 
   // Amounts show thousands separators, except while a field is being edited.
   form.addEventListener('focusin', e => {
