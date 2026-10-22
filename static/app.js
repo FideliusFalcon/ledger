@@ -132,7 +132,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // always move; in name fields left/right only leave at the edge of the text.
   // Enter saves.
   // More vim keys in amount fields: ^/$ first/last month, gg/G first/last line, { } previous/next
-  // section, i/a cursor at start/end, Esc select again, x clear, u restore saved value, y copy, p paste.
+  // section, i/a cursor at start/end, Esc select again, x clear, u restore saved value, y copy, p paste,
+  // f copy to the following months.
   const rows = [...form.querySelectorAll('tr.line')]
   const lineRows = rows
   const sections = [...form.querySelectorAll('tbody[data-section]')].filter(b => b.querySelector('tr.line'))
@@ -175,6 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
       a: () => inp.setSelectionRange(inp.value.length, inp.value.length), // … at the end
       Escape: () => inp.select(), // highlight the value again
       x: () => set(''),
+      f: () => fill(inp),
       u: () => set(inp.dataset.saved),
       y: () => { yanked = inp.value },
       p: () => { if (yanked !== null) set(yanked) },
@@ -205,6 +207,33 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!num && !edge) return
     e.preventDefault()
     go(cells[col + (dir === 'left' ? -1 : 1)])
+  })
+
+  // Fill ("f"): copy an amount to the following months of its line.
+  function fill(from) {
+    const cells = [...from.closest('tr').querySelectorAll('input.num')]
+    const v = parse(from.value)
+    if (!v) return
+    for (const c of cells.slice(cells.indexOf(from) + 1)) c.value = fmt(v)
+    from.dispatchEvent(new Event('input', { bubbles: true }))
+  }
+
+  // Unsaved changes: a dot on Save, and the browser asks before leaving the page.
+  // Amounts compare as numbers, so reformatting a field is not a change.
+  const save = form.querySelector('button[value="save"]')
+  const changed = inp => inp.classList.contains('num')
+    ? parse(inp.value) !== parse(inp.defaultValue)
+    : inp.value.trim() !== inp.defaultValue
+  let submitting = false
+  form.addEventListener('input', () => {
+    const dirty = [...form.querySelectorAll('tr.line input')].some(changed)
+    save.classList.toggle('dirty', dirty)
+    save.title = dirty ? save.dataset.unsaved : ''
+  })
+  form.addEventListener('submit', () => { submitting = true })
+  addEventListener('pageshow', () => { submitting = false })
+  addEventListener('beforeunload', e => {
+    if (!submitting && save.classList.contains('dirty')) e.preventDefault()
   })
 
   // After a save the page reloads: come back to the same field and scroll position.

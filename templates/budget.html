@@ -30,7 +30,7 @@
 <div class="budget-layout">
 <form method="post" class="budget">
   <div class="toolbar">
-    <button name="action" value="save">{{$L.T "save"}}</button>
+    <button name="action" value="save" data-unsaved="{{$L.T "budget.unsaved"}}">{{$L.T "save"}}</button>
     <a class="button secondary" href="/budget/{{.Year}}/export" download>⤓ {{$L.T "budget.export"}}</a>
     <button type="button" class="secondary" data-help>⌨ {{$L.T "help.title"}}</button>
   </div>
@@ -102,6 +102,7 @@
     <tr><td><kbd>i</kbd> <kbd>a</kbd></td><td>{{$L.T "help.ia"}}</td></tr>
     <tr><td><kbd>Esc</kbd></td><td>{{$L.T "help.esc"}}</td></tr>
     <tr><td><kbd>x</kbd></td><td>{{$L.T "help.x"}}</td></tr>
+    <tr><td><kbd>f</kbd></td><td>{{$L.T "help.f"}}</td></tr>
     <tr><td><kbd>u</kbd></td><td>{{$L.T "help.u"}}</td></tr>
     <tr><td><kbd>y</kbd> <kbd>p</kbd></td><td>{{$L.T "help.yp"}}</td></tr>
     <tr><td><kbd>Enter</kbd></td><td>{{$L.T "help.enter"}}</td></tr>
