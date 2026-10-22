@@ -1,0 +1,32 @@
+services:
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ledger
+      MYSQL_USER: ledger
+      MYSQL_PASSWORD: change-me
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+    volumes:
+      - db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+
+  ledger:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      LEDGER_BASE_URL: http://localhost:8080
+      LEDGER_DB_DSN: ledger:change-me@tcp(db:3306)/ledger
+      OIDC_ISSUER: https://id.example.com
+      OIDC_CLIENT_ID: change-me
+      OIDC_CLIENT_SECRET: change-me
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  db:

@@ -1,0 +1,58 @@
+package main
+
+import (
+	"net/http"
+	"net/url"
+	"slices"
+)
+
+var themes = []string{"", "light", "dark"}
+
+// example is the amount shown for each number format choice.
+const example Money = 123456
+
+func (a *App) settingsPage(w http.ResponseWriter, r *http.Request) {
+	type numberFormat struct{ ID, Example string }
+	formats := []numberFormat{{"", a.language(r).Money(example)}}
+	for _, id := range []string{"comma", "point"} {
+		f := numberFormats[id]
+		formats = append(formats, numberFormat{id, example.format(f[0], f[1])})
+	}
+	a.render(w, r, "settings", map[string]any{
+		"Title":         a.locale(r).T("settings.title"),
+		"Langs":         a.sortedLocales(),
+		"Themes":        themes,
+		"NumberFormats": formats,
+	})
+}
+
+func (a *App) settingsSave(w http.ResponseWriter, r *http.Request) {
+	// Empty values mean "follow the browser/system/language".
+	lang, theme, nf := r.PostFormValue("lang"), r.PostFormValue("theme"), r.PostFormValue("number_format")
+	_, nfOK := numberFormats[nf]
+	if (lang == "" || a.locales[lang] != nil) && slices.Contains(themes, theme) && (nf == "" || nfOK) {
+		_, err := a.db.ExecContext(r.Context(), "UPDATE users SET lang = ?, theme = ?, number_format = ? WHERE id = ?",
+			lang, theme, nf, currentUser(r).ID)
+		if err != nil {
+			a.fail(w, err)
+			return
+		}
+	}
+	http.Redirect(w, r, "/settings", http.StatusSeeOther)
+}
+
+// themeSave stores the header toggle. JavaScript calls it in the background;
+// without JavaScript the form posts and we go back to the page it came from.
+func (a *App) themeSave(w http.ResponseWriter, r *http.Request) {
+	if theme := r.PostFormValue("theme"); slices.Contains(themes, theme) {
+		if _, err := a.db.ExecContext(r.Context(), "UPDATE users SET theme = ? WHERE id = ?", theme, currentUser(r).ID); err != nil {
+			a.fail(w, err)
+			return
+		}
+	}
+	back := "/"
+	if u, err := url.Parse(r.Referer()); err == nil && u.Path != "" {
+		back = u.Path // path only, so this can never redirect off-site
+	}
+	http.Redirect(w, r, back, http.StatusSeeOther)
+}

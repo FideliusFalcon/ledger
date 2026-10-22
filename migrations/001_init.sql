@@ -1,0 +1,42 @@
+CREATE TABLE users (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  subject VARCHAR(255) NOT NULL UNIQUE,
+  name VARCHAR(255) NOT NULL DEFAULT '',
+  email VARCHAR(255) NOT NULL DEFAULT '',
+  lang VARCHAR(16) NOT NULL DEFAULT '',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE sessions (
+  token_hash CHAR(64) PRIMARY KEY,
+  user_id BIGINT NOT NULL,
+  expires_at DATETIME NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE settings (
+  name VARCHAR(64) PRIMARY KEY,
+  value TEXT NOT NULL
+);
+
+CREATE TABLE budgets (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  year SMALLINT NOT NULL UNIQUE
+);
+
+CREATE TABLE budget_lines (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  budget_id BIGINT NOT NULL,
+  section ENUM('income', 'expense', 'allocation') NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  sort INT NOT NULL DEFAULT 0,
+  FOREIGN KEY (budget_id) REFERENCES budgets(id) ON DELETE CASCADE
+);
+
+CREATE TABLE budget_amounts (
+  line_id BIGINT NOT NULL,
+  month TINYINT NOT NULL,
+  amount DECIMAL(12,2) NOT NULL,
+  PRIMARY KEY (line_id, month),
+  FOREIGN KEY (line_id) REFERENCES budget_lines(id) ON DELETE CASCADE
+);

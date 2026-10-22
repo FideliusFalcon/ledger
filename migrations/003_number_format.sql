@@ -1,0 +1,1 @@
+ALTER TABLE users ADD COLUMN number_format VARCHAR(8) NOT NULL DEFAULT '';

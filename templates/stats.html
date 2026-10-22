@@ -1,0 +1,78 @@
+{{define "content"}}{{$L := .L}}
+<h1>{{.Title}}</h1>
+
+{{if .AllYears}}
+<form class="filters" action="/stats">
+  <label>{{$L.T "stats.from"}}
+    <select name="from" data-autosubmit>{{range .AllYears}}<option{{if eq . $.From}} selected{{end}}>{{.}}</option>{{end}}</select>
+  </label>
+  <label>{{$L.T "stats.to"}}
+    <select name="to" data-autosubmit>{{range .AllYears}}<option{{if eq . $.To}} selected{{end}}>{{.}}</option>{{end}}</select>
+  </label>
+  <noscript><button class="secondary">{{$L.T "budget.go"}}</button></noscript>
+</form>
+{{end}}
+
+{{if not .Years}}
+<p class="hint">{{$L.T "stats.empty"}}</p>
+{{else}}
+<div class="stats">
+  <figure class="chart">
+    <figcaption>{{$L.T "stats.chart"}}</figcaption>
+    <div class="legend">
+      <span><i class="swatch income"></i>{{$L.T "section.income"}}</span>
+      <span><i class="swatch expense"></i>{{$L.T "section.expense"}}</span>
+    </div>
+    <div data-chart="years" data-income="{{$L.T "section.income"}}" data-expense="{{$L.T "section.expense"}}" data-net="{{$L.T "calc.net"}}"></div>
+    <script type="application/json" id="stats-data">{{.Chart}}</script>
+  </figure>
+
+  <figure class="chart">
+    <figcaption>{{$L.T "stats.totals"}}</figcaption>
+    <div class="scroll">
+    <table class="stats-table">
+      <tr class="head">
+        <th>{{$L.T "budget.year"}}</th>
+        <th>{{$L.T "section.income"}}</th><th></th>
+        <th>{{$L.T "section.expense"}}</th><th></th>
+        <th>{{$L.T "calc.net"}}</th><th></th>
+        <th>{{$L.T "section.allocation"}}</th><th></th>
+      </tr>
+      {{range .Years}}
+      <tr>
+        <th><a href="/budget/{{.Year}}">{{.Year}}</a></th>
+        <td class="num">{{$L.Money .Income}}</td><td class="delta {{.IncomeDelta.Class}}">{{.IncomeDelta.Text}}</td>
+        <td class="num">{{$L.Money .Expense}}</td><td class="delta {{.ExpenseDelta.Class}}">{{.ExpenseDelta.Text}}</td>
+        <td class="num">{{$L.Money .Net}}</td><td class="delta {{.NetDelta.Class}}">{{.NetDelta.Text}}</td>
+        <td class="num">{{$L.Money .Allocation}}</td><td class="delta {{.AllocationDelta.Class}}">{{.AllocationDelta.Text}}</td>
+      </tr>
+      {{end}}
+    </table>
+    </div>
+    <p class="hint">{{$L.T "stats.delta_hint"}}</p>
+  </figure>
+
+  {{range .LineTables}}
+  <figure class="chart">
+    <figcaption>{{$L.T (print "stats.lines_" .Key)}}</figcaption>
+    <div class="scroll">
+    <table class="stats-table">
+      <tr class="head">
+        <th></th>
+        {{range $.Years}}<th>{{.Year}}</th>{{end}}
+        <th>{{$L.T "stats.change"}}</th>
+      </tr>
+      {{range .Lines}}
+      <tr>
+        <th>{{.Name}}</th>
+        {{range .Values}}<td class="num">{{if .}}{{$L.Money .}}{{else}}<span class="hint">–</span>{{end}}</td>{{end}}
+        <td class="delta {{.Delta.Class}}">{{.Delta.Text}}</td>
+      </tr>
+      {{end}}
+    </table>
+    </div>
+  </figure>
+  {{end}}
+</div>
+{{end}}
+{{end}}

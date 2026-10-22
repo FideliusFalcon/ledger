@@ -1,0 +1,24 @@
+{{define "content"}}
+<h1>{{.Title}}</h1>
+<form method="post" class="card">
+  <p class="hint">{{.L.T "settings.user"}} <strong>{{.User.Name}}</strong>{{with .User.Email}} ({{.}}){{end}}</p>
+  <label>{{.L.T "settings.lang"}}
+    <select name="lang">
+      <option value="">{{.L.T "settings.lang_auto"}}</option>
+      {{range .Langs}}<option value="{{.Code}}"{{if eq .Code $.User.Lang}} selected{{end}}>{{.Name}}</option>{{end}}
+    </select>
+  </label>
+  <p class="hint">{{.L.T "settings.lang_hint"}}</p>
+  <label>{{.L.T "settings.numbers"}}
+    <select name="number_format">
+      {{range .NumberFormats}}<option value="{{.ID}}"{{if eq .ID $.User.NumberFormat}} selected{{end}}>{{if .ID}}{{.Example}}{{else}}{{$.L.T "settings.numbers_auto" .Example}}{{end}}</option>{{end}}
+    </select>
+  </label>
+  <label>{{.L.T "settings.theme"}}
+    <select name="theme">
+      {{range .Themes}}<option value="{{.}}"{{if eq . $.User.Theme}} selected{{end}}>{{$.L.T (print "settings.theme_" (or . "auto"))}}</option>{{end}}
+    </select>
+  </label>
+  <button>{{.L.T "save"}}</button>
+</form>
+{{end}}

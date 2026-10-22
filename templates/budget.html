@@ -1,0 +1,144 @@
+{{define "content"}}{{$L := .L}}
+<form class="yearnav" action="/budget/">
+  <h1>{{$L.T "nav.budget"}}</h1>
+  <a href="/budget/{{.Prev}}">‹ {{.Prev}}</a>
+  <select name="year" aria-label="{{$L.T "budget.year"}}" data-autosubmit>
+    {{range .Years}}<option{{if eq . $.Year}} selected{{end}}>{{.}}</option>{{end}}
+  </select>
+  <a href="/budget/{{.Next}}">{{.Next}} ›</a>
+  <noscript><button class="secondary">{{$L.T "budget.go"}}</button></noscript>
+</form>
+
+{{if not .Budget}}
+<form method="post" action="/budget/{{.Year}}/create" class="card create">
+  <h2>{{$L.T "budget.none" .Year}}</h2>
+  {{if .PrevExists}}
+  <div class="option">
+    <div class="row">
+      <button name="from" value="{{.Prev}}">{{$L.T "budget.copy_from" .Prev}}</button>
+      <label class="check"><input type="checkbox" name="amounts" value="1"> {{$L.T "budget.copy_amounts"}}</label>
+    </div>
+    <p class="hint">{{$L.T "budget.copy_hint" .Prev}}</p>
+  </div>
+  {{end}}
+  <div class="option">
+    <div class="row"><button class="secondary">{{$L.T "budget.create_empty"}}</button></div>
+    <p class="hint">{{$L.T "budget.empty_hint"}}</p>
+  </div>
+</form>
+{{else}}
+<div class="budget-layout">
+<form method="post" class="budget">
+  <div class="toolbar">
+    <button name="action" value="save">{{$L.T "save"}}</button>
+    <a class="button secondary" href="/budget/{{.Year}}/export" download>⤓ {{$L.T "budget.export"}}</a>
+    <button type="button" class="secondary" data-help>⌨ {{$L.T "help.title"}}</button>
+  </div>
+  <div class="scroll">
+  <table>
+    {{range .Sections}}
+    <tbody data-section="{{.Key}}">
+      <tr class="head">
+        <th>{{$L.T (print "section." .Key)}}</th>
+        {{range $.Months}}<th>{{$L.T (print "month." .)}}</th>{{end}}
+        <th>{{$L.T "budget.year"}}</th><th></th>
+      </tr>
+      {{range .Lines}}{{$line := .}}
+      <tr class="line">
+        <td><input name="n_{{.ID}}" value="{{.Name}}" required></td>
+        {{range $.Months}}<td><input class="num" name="a_{{$line.ID}}_{{.}}" value="{{$L.Input (index $line.Amounts .)}}" inputmode="decimal" pattern="{{$.Pattern}}"></td>{{end}}
+        <td class="num total">{{$L.Money (index .Amounts 0)}}</td>
+        <td class="actions">
+          <button class="icon" name="action" value="up:{{.ID}}" title="{{$L.T "budget.move_up"}}">↑</button>
+          <button class="icon" name="action" value="down:{{.ID}}" title="{{$L.T "budget.move_down"}}">↓</button>
+          <button class="icon" name="action" value="delete:{{.ID}}" title="{{$L.T "budget.delete"}}" data-confirm="{{$L.T "budget.confirm_delete" .Name}}">×</button>
+        </td>
+      </tr>
+      {{end}}
+      <tr class="new">
+        <td><input name="new_{{.Key}}" placeholder="{{$L.T "budget.new_line"}}"></td>
+        <td colspan="14"><button class="secondary" name="action" value="add:{{.Key}}">+ {{$L.T "budget.add"}}</button></td>
+      </tr>
+      <tr class="calc" data-calc="{{.Key}}">
+        <th>{{$L.T (print "calc." .Key)}}</th>
+        {{range .Total.Months}}<td class="num">{{$L.Money .}}</td>{{end}}
+        <td class="num">{{$L.Money (index .Total 0)}}</td><td></td>
+      </tr>
+      {{if eq .Key "allocation"}}
+      <tr class="calc difference" data-calc="difference">
+        <th>{{$L.T "calc.difference"}}</th>
+        {{range $.Difference.Months}}<td class="num">{{$L.Money .}}</td>{{end}}
+        <td class="num">{{$L.Money (index $.Difference 0)}}</td><td></td>
+      </tr>
+      {{end}}
+    </tbody>
+    {{if eq .Key "expense"}}
+    <tbody class="summary">
+      <tr class="head">
+        <th>{{$L.T "section.disposable"}}</th>
+        {{range $.Months}}<th>{{$L.T (print "month." .)}}</th>{{end}}
+        <th>{{$L.T "budget.year"}}</th><th></th>
+      </tr>
+      {{range $.Summary}}
+      <tr class="calc" data-calc="{{.Key}}">
+        <th>{{$L.T (print "calc." .Key)}}</th>
+        {{range .Values.Months}}<td class="num">{{$L.Money .}}</td>{{end}}
+        <td class="num">{{$L.Money (index .Values 0)}}</td><td></td>
+      </tr>
+      {{end}}
+    </tbody>
+    {{end}}
+    {{end}}
+  </table>
+  </div>
+</form>
+
+<dialog class="help">
+  <h2>{{$L.T "help.title"}}</h2>
+  <table>
+    <tr><th colspan="2">{{$L.T "help.move"}}</th></tr>
+    <tr><td><kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd></td><td>{{$L.T "help.arrows"}}</td></tr>
+    <tr><td><kbd>h</kbd> <kbd>j</kbd> <kbd>k</kbd> <kbd>l</kbd></td><td>{{$L.T "help.hjkl"}}</td></tr>
+    <tr><td><kbd>^</kbd> <kbd>$</kbd> <kbd>Home</kbd> <kbd>End</kbd></td><td>{{$L.T "help.line"}}</td></tr>
+    <tr><td><kbd>gg</kbd> <kbd>G</kbd></td><td>{{$L.T "help.gG"}}</td></tr>
+    <tr><td><kbd>{</kbd> <kbd>}</kbd></td><td>{{$L.T "help.braces"}}</td></tr>
+    <tr><th colspan="2">{{$L.T "help.edit"}}</th></tr>
+    <tr><td><kbd>x</kbd></td><td>{{$L.T "help.x"}}</td></tr>
+    <tr><td><kbd>u</kbd></td><td>{{$L.T "help.u"}}</td></tr>
+    <tr><td><kbd>y</kbd> <kbd>p</kbd></td><td>{{$L.T "help.yp"}}</td></tr>
+    <tr><td><kbd>Enter</kbd></td><td>{{$L.T "help.enter"}}</td></tr>
+    <tr><td><kbd>?</kbd></td><td>{{$L.T "help.help"}}</td></tr>
+  </table>
+  <p class="hint">{{$L.T "help.note"}}</p>
+  <form method="dialog"><button>{{$L.T "help.close"}}</button></form>
+</dialog>
+
+{{/* Filled in by app.js from the grid above, so it follows edits live. */}}
+<aside class="charts" data-other="{{$L.T "chart.other"}}" data-empty="{{$L.T "chart.empty"}}">
+  <h2>{{$L.T "chart.overview" .Year}}</h2>
+  <div class="tiles">
+    <div class="tile" data-tile="income"><span class="label">{{$L.T "section.income"}}</span><span class="value"></span></div>
+    <div class="tile" data-tile="expense"><span class="label">{{$L.T "section.expense"}}</span><span class="value"></span></div>
+    <div class="tile" data-tile="net"><span class="label">{{$L.T "calc.net"}}</span><span class="value"></span></div>
+    <div class="tile" data-tile="difference"><span class="label">{{$L.T "calc.difference"}}</span><span class="value"></span></div>
+  </div>
+  <figure class="chart wide">
+    <figcaption>{{$L.T "chart.monthly"}}</figcaption>
+    <div class="legend">
+      <span><i class="swatch income"></i>{{$L.T "section.income"}}</span>
+      <span><i class="swatch expense"></i>{{$L.T "section.expense"}}</span>
+    </div>
+    <div data-chart="monthly" data-income="{{$L.T "section.income"}}" data-expense="{{$L.T "section.expense"}}" data-net="{{$L.T "calc.net"}}"></div>
+  </figure>
+  <figure class="chart">
+    <figcaption>{{$L.T "chart.expense"}}</figcaption>
+    <div class="hbars" data-chart="expense"></div>
+  </figure>
+  <figure class="chart">
+    <figcaption>{{$L.T "chart.allocation"}}</figcaption>
+    <div class="hbars" data-chart="allocation"></div>
+  </figure>
+</aside>
+</div>
+{{end}}
+{{end}}
