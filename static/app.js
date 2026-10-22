@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // always move; in name fields left/right only leave at the edge of the text.
   // Enter saves (or adds the line, in a "new line" field).
   // More vim keys in amount fields: ^/$ first/last month, gg/G first/last line, { } previous/next
-  // section, x clear, u restore saved value, y copy, p paste.
+  // section, i/a cursor at start/end, Esc select again, x clear, u restore saved value, y copy, p paste.
   const rows = [...form.querySelectorAll('tr.line, tr.new')]
   const lineRows = rows.filter(r => r.classList.contains('line'))
   const sections = [...form.querySelectorAll('tbody[data-section]')].filter(b => b.querySelector('tr.line'))
@@ -173,6 +173,9 @@ document.addEventListener('DOMContentLoaded', () => {
       '{': () => go(cellIn(sectionStart(-1))),
       '}': () => go(cellIn(sectionStart(1))),
       '?': showHelp,
+      i: () => inp.setSelectionRange(0, 0), // drop the highlight, cursor at the start
+      a: () => inp.setSelectionRange(inp.value.length, inp.value.length), // … at the end
+      Escape: () => inp.select(), // highlight the value again
       x: () => set(''),
       u: () => set(inp.dataset.saved),
       y: () => { yanked = inp.value },

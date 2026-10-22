@@ -49,6 +49,8 @@
   "help.gG": "Første / sidste linje i budgettet",
   "help.braces": "Forrige / næste sektion",
   "help.edit": "Redigér",
+  "help.ia": "Fjern markeringen og sæt markøren i starten / slutningen af beløbet",
+  "help.esc": "Markér hele beløbet igen",
   "help.x": "Ryd feltet",
   "help.u": "Gendan det gemte beløb",
   "help.yp": "Kopiér beløbet / indsæt det i det aktuelle felt",

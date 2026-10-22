@@ -49,6 +49,8 @@
   "help.gG": "First / last line of the budget",
   "help.braces": "Previous / next section",
   "help.edit": "Edit",
+  "help.ia": "Remove the highlight and put the cursor at the start / end of the amount",
+  "help.esc": "Highlight the whole amount again",
   "help.x": "Clear the cell",
   "help.u": "Restore the saved amount",
   "help.yp": "Copy the amount / paste it into the current cell",
