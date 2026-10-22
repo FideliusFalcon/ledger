@@ -2,6 +2,8 @@ package main
 
 import (
 	"bytes"
+	"crypto/sha256"
+	"encoding/hex"
 	"html/template"
 	"io/fs"
 	"log"
@@ -17,7 +19,7 @@ var coreNav = []NavItem{
 
 // parsePages pairs every template with layout.html, keyed by file name without extension.
 func parsePages() (map[string]*template.Template, error) {
-	funcs := template.FuncMap{"hasPrefix": strings.HasPrefix}
+	funcs := template.FuncMap{"hasPrefix": strings.HasPrefix, "asset": asset}
 	files, err := fs.Glob(embedded, "templates/*.html")
 	if err != nil {
 		return nil, err
@@ -35,6 +37,18 @@ func parsePages() (map[string]*template.Template, error) {
 		pages[strings.TrimSuffix(name, ".html")] = t
 	}
 	return pages, nil
+}
+
+// asset returns the URL of a static file with a hash of its content in the path, so a
+// changed file gets a new URL and no browser or proxy cache serves the old one. The hash
+// is in the path rather than the query string because some caches ignore query strings.
+func asset(name string) string {
+	b, err := fs.ReadFile(embedded, "static/"+name)
+	if err != nil {
+		return "/static/" + name
+	}
+	sum := sha256.Sum256(b)
+	return "/static/v/" + hex.EncodeToString(sum[:4]) + "/" + name
 }
 
 func (a *App) render(w http.ResponseWriter, r *http.Request, page string, data map[string]any) {
