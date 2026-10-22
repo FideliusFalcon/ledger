@@ -77,6 +77,16 @@ and either put it in `locales/` (compiled in) or in `LEDGER_LOCALES_DIR`. Missin
 A plugin implements the `Plugin` interface in `plugin.go` and calls `register` from `init()`.
 It can add migrations (tracked per plugin), routes behind login and menu entries.
 
+## Tests
+
+`go test ./...` runs the unit tests. The database tests also need a disposable MySQL database; they wipe it, so its name must contain `test`:
+
+```sh
+LEDGER_TEST_DSN='ledger:ledger@tcp(127.0.0.1:3306)/ledger_test' go test ./...
+```
+
+Without `LEDGER_TEST_DSN` they are skipped. CI runs everything against a MySQL service container.
+
 ## License
 
 MIT, see [LICENSE](LICENSE).

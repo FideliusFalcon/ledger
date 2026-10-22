@@ -34,7 +34,7 @@ func (m Money) Value() (driver.Value, error) { return m.format(".", ""), nil }
 // "." as separator "12.500" is 12500 and "12.5" is an error, never 12.5.
 func parseMoney(s, decimal, thousands string) (Money, error) {
 	s = strings.TrimSpace(s)
-	if s == "" {
+	if s == "" || s == "-" { // a lone minus is an unfinished entry, like an empty field
 		return 0, nil
 	}
 	neg := strings.HasPrefix(s, "-")

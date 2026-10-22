@@ -10,6 +10,22 @@ jobs:
   test:
     name: test
     runs-on: ubuntu-latest
+    # A throwaway MySQL for the database tests (db_test.go).
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: ledger_test
+          MYSQL_USER: ledger
+          MYSQL_PASSWORD: ledger
+          MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-go@v7
@@ -17,4 +33,6 @@ jobs:
           go-version: '1.27'
           cache: false
       - name: go test
-        run: go test -v ./...
+        env:
+          LEDGER_TEST_DSN: ledger:ledger@tcp(127.0.0.1:3306)/ledger_test
+        run: go test -v -cover ./...
