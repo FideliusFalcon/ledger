@@ -115,6 +115,8 @@ input.num { width: 4.5rem; text-align: right; }
 td.total { font-weight: 600; padding-left: .75rem; }
 tr.calc th, tr.calc td { border-top: 1px solid var(--border); font-weight: 600; }
 tr.head button.add { margin-left: .25rem; font-size: 1.15rem; line-height: 1; color: var(--accent); }
+/* No moving the first line up or the last line down; hidden rather than removed so the arrows stay aligned. */
+tr.head + tr.line button[value^="up:"], tr.line:has(+ tr.calc) button[value^="down:"] { visibility: hidden; }
 .neg { color: var(--neg); }
 .difference .neg { background: color-mix(in srgb, var(--neg) 15%, transparent); }
 .difference .pos { background: color-mix(in srgb, var(--pos) 15%, transparent); }
