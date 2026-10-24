@@ -51,7 +51,16 @@ export LEDGER_DB_DSN='ledger:ledger@tcp(127.0.0.1:3306)/ledger'
 | `LEDGER_ADDR` | no | Listen address, default `:8080` (`127.0.0.1:8080` in local mode) |
 | `LEDGER_LOCALES_DIR` | no | Extra or overriding language files |
 
-The database schema is created and migrated automatically on startup.
+### Database
+
+Ledger needs an empty MariaDB database and a user that owns it. The schema is created and migrated automatically on startup.
+With `compose.yaml` the `MARIADB_*` variables create both on the first start. On an existing server, run as root:
+
+```sql
+CREATE DATABASE ledger CHARACTER SET utf8mb4;
+CREATE USER 'ledger'@'%' IDENTIFIED BY 'secret';
+GRANT ALL PRIVILEGES ON ledger.* TO 'ledger'@'%';
+```
 
 ### Pocket ID
 
