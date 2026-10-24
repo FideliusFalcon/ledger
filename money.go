@@ -29,7 +29,10 @@ func (m *Money) Scan(src any) error {
 
 func (m Money) Value() (driver.Value, error) { return m.format(".", ""), nil }
 
-// parseMoney accepts an optional minus, digits and up to two decimals.
+// maxWhole matches the DECIMAL(12,2) amount column.
+const maxWhole = 10
+
+// parseMoney accepts an optional minus, up to maxWhole digits and up to two decimals.
 // Thousands separators are only accepted in proper groups of three, so with
 // "." as separator "12.500" is 12500 and "12.5" is an error, never 12.5.
 func parseMoney(s, decimal, thousands string) (Money, error) {
@@ -48,7 +51,7 @@ func parseMoney(s, decimal, thousands string) (Money, error) {
 		}
 		whole = strings.Join(groups, "")
 	}
-	if len(frac) > 2 || whole+frac == "" || strings.Trim(whole+frac, "0123456789") != "" {
+	if len(frac) > 2 || len(strings.TrimLeft(whole, "0")) > maxWhole || whole+frac == "" || strings.Trim(whole+frac, "0123456789") != "" {
 		return 0, fmt.Errorf("invalid amount %q", s)
 	}
 	w, err := strconv.ParseInt("0"+whole, 10, 64)

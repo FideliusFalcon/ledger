@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/url"
 	"slices"
+	"strings"
 )
 
 var themes = []string{"", "light", "dark"}
@@ -52,7 +53,7 @@ func (a *App) themeSave(w http.ResponseWriter, r *http.Request) {
 	}
 	back := "/"
 	if u, err := url.Parse(r.Referer()); err == nil && u.Path != "" {
-		back = u.Path // path only, so this can never redirect off-site
+		back = "/" + strings.TrimLeft(u.Path, "/") // "//host" would redirect off-site
 	}
 	http.Redirect(w, r, back, http.StatusSeeOther)
 }
