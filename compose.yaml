@@ -15,7 +15,7 @@ services:
       interval: 5s
 
   ledger:
-    build: .
+    image: ghcr.io/staal0/ledger:latest
     restart: unless-stopped
     ports:
       - "8080:8080"

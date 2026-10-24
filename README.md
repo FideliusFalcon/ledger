@@ -75,15 +75,7 @@ Images are published to `ghcr.io/staal0/ledger`. `latest` is the newest release;
 docker pull ghcr.io/staal0/ledger:latest
 ```
 
-To run it with Docker Compose, take `compose.yaml` and replace `build: .` with the image:
-
-```yaml
-services:
-  ledger:
-    image: ghcr.io/staal0/ledger:latest
-```
-
-Then `docker compose up -d`. Or build from source:
+To run it with Docker Compose, download [`compose.yaml`](compose.yaml), replace the `change-me` values and the URLs, and run `docker compose up -d`. Or build from source:
 
 ```sh
 go build && LEDGER_DB_DSN=... OIDC_ISSUER=... OIDC_CLIENT_ID=... ./ledger
