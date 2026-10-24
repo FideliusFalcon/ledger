@@ -1,6 +1,6 @@
 package main
 
-// Tests that need MySQL. They run when LEDGER_TEST_DSN points at a disposable
+// Tests that need MariaDB. They run when LEDGER_TEST_DSN points at a disposable
 // database whose name contains "test" (it is wiped), and are skipped otherwise:
 //
 //	LEDGER_TEST_DSN='ledger:ledger@tcp(127.0.0.1:3306)/ledger_test' go test ./...
@@ -31,7 +31,7 @@ func testApp(t *testing.T, login bool) *App {
 	t.Helper()
 	dsn := os.Getenv("LEDGER_TEST_DSN")
 	if dsn == "" {
-		t.Skip("set LEDGER_TEST_DSN to a disposable MySQL database to run database tests")
+		t.Skip("set LEDGER_TEST_DSN to a disposable MariaDB database to run database tests")
 	}
 	if cfg, err := mysql.ParseDSN(dsn); err != nil || !strings.Contains(cfg.DBName, "test") {
 		t.Fatalf("refusing LEDGER_TEST_DSN: the database name must contain \"test\" because the tests delete all its data")
