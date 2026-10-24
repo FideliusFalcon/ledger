@@ -1,6 +1,6 @@
 services:
   db:
-    image: mariadb:13.0
+    image: mariadb:lts
     restart: unless-stopped
     environment:
       MARIADB_DATABASE: ledger
