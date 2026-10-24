@@ -25,15 +25,15 @@ Planned: bank CSV import and budget vs. actual.
 
 ## Try it
 
-Start a throwaway MySQL, fill it with a fictional demo household and run Ledger in local mode (no login, only reachable from your own machine):
+Start a throwaway MariaDB, fill it with a fictional demo household and run Ledger in local mode (no login, only reachable from your own machine):
 
 ```sh
 docker run -d --name ledger-demo-db -p 127.0.0.1:3306:3306 \
-  -e MYSQL_DATABASE=ledger -e MYSQL_USER=ledger -e MYSQL_PASSWORD=ledger -e MYSQL_RANDOM_ROOT_PASSWORD=yes mysql:8.4
+  -e MARIADB_DATABASE=ledger -e MARIADB_USER=ledger -e MARIADB_PASSWORD=ledger -e MARIADB_RANDOM_ROOT_PASSWORD=yes mariadb:12.3
 
 go build
 export LEDGER_DB_DSN='ledger:ledger@tcp(127.0.0.1:3306)/ledger'
-./ledger demo        # or "./ledger demo da" for Danish line names; give MySQL ~20 s to start first
+./ledger demo        # or "./ledger demo da" for Danish line names; give MariaDB ~20 s to start first
 ./ledger             # then open http://localhost:8080
 ```
 
@@ -93,13 +93,13 @@ It can add migrations (tracked per plugin), routes behind login and menu entries
 
 ## Tests
 
-`go test ./...` runs the unit tests. The database tests also need a disposable MySQL database; they wipe it, so its name must contain `test`:
+`go test ./...` runs the unit tests. The database tests also need a disposable MariaDB database; they wipe it, so its name must contain `test`:
 
 ```sh
 LEDGER_TEST_DSN='ledger:ledger@tcp(127.0.0.1:3306)/ledger_test' go test ./...
 ```
 
-Without `LEDGER_TEST_DSN` they are skipped. CI runs everything against a MySQL service container.
+Without `LEDGER_TEST_DSN` they are skipped. CI runs everything against a MariaDB service container.
 
 ## License
 

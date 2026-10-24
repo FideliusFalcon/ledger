@@ -1,16 +1,16 @@
 services:
   db:
-    image: mysql:8.4
+    image: mariadb:12.3
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: ledger
-      MYSQL_USER: ledger
-      MYSQL_PASSWORD: change-me
-      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+      MARIADB_DATABASE: ledger
+      MARIADB_USER: ledger
+      MARIADB_PASSWORD: change-me
+      MARIADB_RANDOM_ROOT_PASSWORD: "yes"
     volumes:
       - db:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 5s
 
   ledger:
