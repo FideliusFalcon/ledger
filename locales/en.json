@@ -100,5 +100,6 @@
   "settings.theme_auto": "Automatic (system)",
   "settings.theme_light": "Light",
   "settings.theme_dark": "Dark",
+  "settings.version": "Version %s",
   "settings.lang_hint": "To add a language, copy locales/en.json to a new file such as de.json in LEDGER_LOCALES_DIR, translate it and restart."
 }

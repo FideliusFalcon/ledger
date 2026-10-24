@@ -17,6 +17,9 @@ import (
 //go:embed locales migrations static templates
 var embedded embed.FS
 
+// version is set at build time with -ldflags "-X main.version=...".
+var version = "dev"
+
 type Config struct {
 	Addr         string
 	BaseURL      string

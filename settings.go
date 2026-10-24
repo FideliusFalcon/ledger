@@ -24,6 +24,7 @@ func (a *App) settingsPage(w http.ResponseWriter, r *http.Request) {
 		"Langs":         a.sortedLocales(),
 		"Themes":        themes,
 		"NumberFormats": formats,
+		"Version":       version,
 	})
 }
 
