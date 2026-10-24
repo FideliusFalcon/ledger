@@ -53,7 +53,7 @@
   "help.ia": "Fjern markeringen og sæt markøren i starten / slutningen af beløbet",
   "help.esc": "Markér hele beløbet igen",
   "help.x": "Ryd feltet",
-  "help.f": "Kopiér beløbet til de følgende måneder",
+  "help.f": "Kopiér beløbet til de følgende måneder (et tomt felt rydder dem)",
   "help.u": "Gendan det gemte beløb",
   "help.yp": "Kopiér beløbet / indsæt det i det aktuelle felt",
   "help.enter": "Gem",

@@ -53,7 +53,7 @@
   "help.ia": "Remove the highlight and put the cursor at the start / end of the amount",
   "help.esc": "Highlight the whole amount again",
   "help.x": "Clear the cell",
-  "help.f": "Copy the amount to the following months",
+  "help.f": "Copy the amount to the following months (an empty cell clears them)",
   "help.u": "Restore the saved amount",
   "help.yp": "Copy the amount / paste it into the current cell",
   "help.enter": "Save",

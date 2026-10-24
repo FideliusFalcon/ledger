@@ -135,7 +135,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // section, i/a cursor at start/end, Esc select again, x clear, u restore saved value, y copy, p paste,
   // f copy to the following months.
   const rows = [...form.querySelectorAll('tr.line')]
-  const lineRows = rows
   const sections = [...form.querySelectorAll('tbody[data-section]')].filter(b => b.querySelector('tr.line'))
   const go = inp => { if (inp) { inp.focus(); inp.select() } }
   const keys = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' }
@@ -163,8 +162,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const g = pendingG
     pendingG = false
     const edit = num && {
-      g: () => { if (g) go(cellIn(lineRows[0])); else pendingG = true },
-      G: () => go(cellIn(lineRows.at(-1))),
+      g: () => { if (g) go(cellIn(rows[0])); else pendingG = true },
+      G: () => go(cellIn(rows.at(-1))),
       '^': () => go(cells[1]), // January; cells[0] is the name
       $: () => go(cells.at(-1)), // December
       Home: () => go(cells[1]),
@@ -213,8 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function fill(from) {
     const cells = [...from.closest('tr').querySelectorAll('input.num')]
     const v = parse(from.value)
-    if (!v) return
-    for (const c of cells.slice(cells.indexOf(from) + 1)) c.value = fmt(v)
+    for (const c of cells.slice(cells.indexOf(from) + 1)) c.value = v ? fmt(v) : ''
     from.dispatchEvent(new Event('input', { bubbles: true }))
   }
 
