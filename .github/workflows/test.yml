@@ -13,7 +13,7 @@ jobs:
     # A throwaway MariaDB for the database tests (db_test.go).
     services:
       mariadb:
-        image: mariadb:12.3
+        image: mariadb:lts
         env:
           MARIADB_DATABASE: ledger_test
           MARIADB_USER: ledger

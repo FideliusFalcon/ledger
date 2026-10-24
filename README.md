@@ -29,7 +29,7 @@ Start a throwaway MariaDB, fill it with a fictional demo household and run Ledge
 
 ```sh
 docker run -d --name ledger-demo-db -p 127.0.0.1:3306:3306 \
-  -e MARIADB_DATABASE=ledger -e MARIADB_USER=ledger -e MARIADB_PASSWORD=ledger -e MARIADB_RANDOM_ROOT_PASSWORD=yes mariadb:12.3
+  -e MARIADB_DATABASE=ledger -e MARIADB_USER=ledger -e MARIADB_PASSWORD=ledger -e MARIADB_RANDOM_ROOT_PASSWORD=yes mariadb:lts
 
 go build
 export LEDGER_DB_DSN='ledger:ledger@tcp(127.0.0.1:3306)/ledger'
