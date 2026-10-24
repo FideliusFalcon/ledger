@@ -60,9 +60,23 @@ Everyone who can log in to the client has access, so restrict it to your househo
 
 ## Running
 
+Images are published to `ghcr.io/staal0/ledger`. `latest` is the newest release; each release is also tagged with its version for pinning:
+
 ```sh
-docker compose up -d   # see compose.yaml
-# or
+docker pull ghcr.io/staal0/ledger:latest
+```
+
+To run it with Docker Compose, take `compose.yaml` and replace `build: .` with the image:
+
+```yaml
+services:
+  ledger:
+    image: ghcr.io/staal0/ledger:latest
+```
+
+Then `docker compose up -d`. Or build from source:
+
+```sh
 go build && LEDGER_DB_DSN=... OIDC_ISSUER=... OIDC_CLIENT_ID=... ./ledger
 ```
 
