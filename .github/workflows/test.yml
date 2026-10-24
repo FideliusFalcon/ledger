@@ -10,19 +10,19 @@ jobs:
   test:
     name: test
     runs-on: ubuntu-latest
-    # A throwaway MySQL for the database tests (db_test.go).
+    # A throwaway MariaDB for the database tests (db_test.go).
     services:
-      mysql:
-        image: mysql:8.4
+      mariadb:
+        image: mariadb:lts
         env:
-          MYSQL_DATABASE: ledger_test
-          MYSQL_USER: ledger
-          MYSQL_PASSWORD: ledger
-          MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+          MARIADB_DATABASE: ledger_test
+          MARIADB_USER: ledger
+          MARIADB_PASSWORD: ledger
+          MARIADB_RANDOM_ROOT_PASSWORD: 'yes'
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1"
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
           --health-interval=5s
           --health-timeout=5s
           --health-retries=20

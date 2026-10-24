@@ -77,6 +77,9 @@ func TestSettings(t *testing.T) {
 			t.Errorf("alice's page lacks %q", want)
 		}
 	}
+	if page := request(a, "GET", "/settings", nil, alice).Body.String(); !strings.Contains(page, "Version dev") {
+		t.Error("settings page lacks the version")
+	}
 	// Settings are per user.
 	if page := request(a, "GET", "/budget/2030", nil, bob).Body.String(); !strings.Contains(page, `<html lang="en">`) {
 		t.Error("bob got alice's settings")

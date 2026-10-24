@@ -9,6 +9,8 @@ linters:
       # when the client has gone or never.
       exclude-functions:
         - (*database/sql.Rows).Close
+        - (*database/sql.DB).Close
+        - (io.ReadCloser).Close
         - (*database/sql.Tx).Rollback
         - (*bytes.Buffer).WriteTo
         - fmt.Fprint

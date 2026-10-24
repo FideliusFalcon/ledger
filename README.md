@@ -25,15 +25,15 @@ Planned: bank CSV import and budget vs. actual.
 
 ## Try it
 
-Start a throwaway MySQL, fill it with a fictional demo household and run Ledger in local mode (no login, only reachable from your own machine):
+Start a throwaway MariaDB, fill it with a fictional demo household and run Ledger in local mode (no login, only reachable from your own machine):
 
 ```sh
 docker run -d --name ledger-demo-db -p 127.0.0.1:3306:3306 \
-  -e MYSQL_DATABASE=ledger -e MYSQL_USER=ledger -e MYSQL_PASSWORD=ledger -e MYSQL_RANDOM_ROOT_PASSWORD=yes mysql:8.4
+  -e MARIADB_DATABASE=ledger -e MARIADB_USER=ledger -e MARIADB_PASSWORD=ledger -e MARIADB_RANDOM_ROOT_PASSWORD=yes mariadb:lts
 
 go build
 export LEDGER_DB_DSN='ledger:ledger@tcp(127.0.0.1:3306)/ledger'
-./ledger demo        # or "./ledger demo da" for Danish line names; give MySQL ~20 s to start first
+./ledger demo        # or "./ledger demo da" for Danish line names; give MariaDB ~20 s to start first
 ./ledger             # then open http://localhost:8080
 ```
 
@@ -51,7 +51,16 @@ export LEDGER_DB_DSN='ledger:ledger@tcp(127.0.0.1:3306)/ledger'
 | `LEDGER_ADDR` | no | Listen address, default `:8080` (`127.0.0.1:8080` in local mode) |
 | `LEDGER_LOCALES_DIR` | no | Extra or overriding language files |
 
-The database schema is created and migrated automatically on startup.
+### Database
+
+Ledger needs an empty MariaDB database and a user that owns it. The schema is created and migrated automatically on startup.
+With `compose.yaml` the `MARIADB_*` variables create both on the first start. On an existing server, run as root:
+
+```sql
+CREATE DATABASE ledger CHARACTER SET utf8mb4;
+CREATE USER 'ledger'@'%' IDENTIFIED BY 'secret';
+GRANT ALL PRIVILEGES ON ledger.* TO 'ledger'@'%';
+```
 
 ### Pocket ID
 
@@ -60,9 +69,15 @@ Everyone who can log in to the client has access, so restrict it to your househo
 
 ## Running
 
+Images are published to `ghcr.io/staal0/ledger`. `latest` is the newest release; each release is also tagged with its version for pinning:
+
 ```sh
-docker compose up -d   # see compose.yaml
-# or
+docker pull ghcr.io/staal0/ledger:latest
+```
+
+To run it with Docker Compose, download [`compose.yaml`](compose.yaml), replace the `change-me` values and the URLs, and run `docker compose up -d`. Or build from source:
+
+```sh
 go build && LEDGER_DB_DSN=... OIDC_ISSUER=... OIDC_CLIENT_ID=... ./ledger
 ```
 
@@ -79,13 +94,13 @@ It can add migrations (tracked per plugin), routes behind login and menu entries
 
 ## Tests
 
-`go test ./...` runs the unit tests. The database tests also need a disposable MySQL database; they wipe it, so its name must contain `test`:
+`go test ./...` runs the unit tests. The database tests also need a disposable MariaDB database; they wipe it, so its name must contain `test`:
 
 ```sh
 LEDGER_TEST_DSN='ledger:ledger@tcp(127.0.0.1:3306)/ledger_test' go test ./...
 ```
 
-Without `LEDGER_TEST_DSN` they are skipped. CI runs everything against a MySQL service container.
+Without `LEDGER_TEST_DSN` they are skipped. CI runs everything against a MariaDB service container.
 
 ## License
 

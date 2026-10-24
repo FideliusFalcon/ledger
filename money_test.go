@@ -21,8 +21,10 @@ func TestParseMoney(t *testing.T) {
 		{".500", ",", ".", 0, false},
 		{"12,345", ",", ".", 0, false}, // three decimals
 		{"12a", ",", ".", 0, false},
-		{"-", ",", ".", 0, true},           // what the browser accepts as an unfinished entry
-		{"1234.56", ".", "", 123456, true}, // database values: no thousands separator
+		{"9999999999,99", ",", ".", 999999999999, true},
+		{"10000000000", ",", ".", 0, false}, // more than DECIMAL(12,2) holds
+		{"-", ",", ".", 0, true},            // what the browser accepts as an unfinished entry
+		{"1234.56", ".", "", 123456, true},  // database values: no thousands separator
 	}
 	for _, tt := range tests {
 		got, err := parseMoney(tt.in, tt.dec, tt.thou)

@@ -4,7 +4,6 @@ package main
 import (
 	"database/sql"
 	"embed"
-	"fmt"
 	"html/template"
 	"io/fs"
 	"log"
@@ -17,6 +16,9 @@ import (
 
 //go:embed locales migrations static templates
 var embedded embed.FS
+
+// version is set at build time with -ldflags "-X main.version=...".
+var version = "dev"
 
 type Config struct {
 	Addr         string
@@ -45,12 +47,15 @@ func main() {
 		OIDCClientID: os.Getenv("OIDC_CLIENT_ID"),
 		OIDCSecret:   os.Getenv("OIDC_CLIENT_SECRET"),
 	}
+	if len(os.Args) > 1 && os.Args[1] == "healthcheck" {
+		os.Exit(healthcheck(env("LEDGER_ADDR", ":8080")))
+	}
 	if cfg.DSN == "" {
 		log.Fatal("LEDGER_DB_DSN must be set")
 	}
 	if len(os.Args) > 1 {
 		if os.Args[1] != "demo" {
-			log.Fatalf("unknown command %q; usage: ledger [demo [en|da]]", os.Args[1])
+			log.Fatalf("unknown command %q; usage: ledger [demo [en|da] | healthcheck]", os.Args[1])
 		}
 		lang := "en"
 		if len(os.Args) > 2 {
@@ -111,7 +116,7 @@ func (a *App) routes() http.Handler {
 		w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
 		http.ServeFileFS(w, r, static, r.PathValue("name"))
 	})
-	public.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) { fmt.Fprint(w, "ok") })
+	public.HandleFunc("GET /healthz", a.healthz)
 	public.HandleFunc("GET /login", a.login)
 	public.HandleFunc("GET /auth/callback", a.callback)
 	public.HandleFunc("POST /logout", a.logout)
